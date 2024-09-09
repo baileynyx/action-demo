@@ -22,12 +22,12 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         server-id: github # Matches the server ID in your settings.xml
-        server-username: ${{ github.actor }} 
-        server-password: ${{ secrets.GITHUB_TOKEN }} 
+        server-username: ${{ github.actor }} # Used to authenticate with the server
+        server-password: ${{ secrets.GITHUB_TOKEN }} # Used to authenticate with the server
         overwrite-settings: true
 
     - name: Build with Maven
       run: mvn clean package
 
     - name: Deploy to GitHub Packages
-      run: mvn deploy
+      run: mvn deploy -X
