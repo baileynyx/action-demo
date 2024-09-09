@@ -20,6 +20,11 @@ jobs:
       uses: actions/setup-java@v3
       with:
         java-version: '17'
+        distribution: 'temurin' # Use the desired distribution, e.g., 'temurin'
+        server-id: github # Matches the server ID in your settings.xml
+        server-username: ${{ github.actor }} # Dynamically set the username
+        server-password: ${{ secrets.GITHUB_TOKEN }} # Dynamically set the token
+        overwrite-settings: true
 
     - name: Build with Maven
       run: mvn clean package
