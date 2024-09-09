@@ -8,7 +8,7 @@
   <version>1.0-SNAPSHOT</version>
 
   <name>actions-demo</name>
-  <url>https://github.com/your-username/actions-demo</url> <!-- Replace your-username with the actual GitHub username -->
+  <url>https://github.com/BaileyNyx/actions-demo</url> <!-- Replace with the actual GitHub repository URL -->
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -28,7 +28,7 @@
   <distributionManagement>
     <repository>
       <id>github</id>
-      <url>https://maven.pkg.github.com/BaileyNyx/actions-demo</url> <!-- Replace your-username with the actual GitHub username -->
+      <url>https://maven.pkg.github.com/BaileyNyx/actions-demo</url> <!-- Replace with the actual GitHub username and repository -->
     </repository>
   </distributionManagement>
 
