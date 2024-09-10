@@ -41,8 +41,8 @@ jobs:
         echo "GitHub Actor: ${{ github.actor }}"
         echo "Repository: ${{ github.repository }}"
         echo "Ref: ${{ github.ref }}"
-        echo "Token Length: ${#secrets.ACTIONS_DEMO_TOKEN}"
-        if [ -z "${{ secrets.ACTIONS_DEMO_TOKEN }}" ]; then
+        echo "Token Length: ${#ACTIONS_DEMO_TOKEN}"
+        if [ -z "$ACTIONS_DEMO_TOKEN" ]; then
           echo "Error: ACTIONS_DEMO_TOKEN is not set or empty."
           exit 1
         else
@@ -55,6 +55,8 @@ jobs:
         
         echo "Constructed Repository URL: $REPO_URL"
         echo "Constructed Packages URL: $PACKAGE_URL"
+      env:
+        ACTIONS_DEMO_TOKEN: ${{ secrets.ACTIONS_DEMO_TOKEN }}  # Set the environment variable
 
     - name: Create Maven settings.xml
       run: |
@@ -85,6 +87,8 @@ jobs:
         PACKAGE_URL="https://maven.pkg.github.com/${{ github.repository }}"
         mvn versions:set-property -Dproperty=repository.url -DnewVersion="$REPO_URL"
         mvn versions:set-property -Dproperty=distribution.url -DnewVersion="$PACKAGE_URL"
+      env:
+        ACTIONS_DEMO_TOKEN: ${{ secrets.ACTIONS_DEMO_TOKEN }}  # Set the environment variable
 
     - name: Debug - Verify Maven Settings and POM URL
       run: |
