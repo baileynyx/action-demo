@@ -11,7 +11,7 @@ on:
 
 permissions:
   contents: write
-  packages: read
+  packages: read  # Only need read permission for packages
 
 jobs:
   deploy:
@@ -49,9 +49,18 @@ jobs:
       env:
         ACTIONS_DEMO_TOKEN: ${{ secrets.ACTIONS_DEMO_TOKEN }}
 
+    - name: Debug - Verify Maven Settings and POM URL
+      run: |
+        echo "Maven settings.xml content:"
+        cat $HOME/.m2/settings.xml
+
     - name: Download Artifact from GitHub Packages
       run: |
-        mvn dependency:get -Dartifact=com.example:actions-demo:1.0-SNAPSHOT -DrepoUrl=https://maven.pkg.github.com/${{ github.repository }}
+        mvn dependency:get -Dartifact=com.example:actions-demo:1.0-SNAPSHOT \
+                           -DrepoUrl=https://maven.pkg.github.com/${{ github.repository }} \
+                           -s $HOME/.m2/settings.xml
+      env:
+        ACTIONS_DEMO_TOKEN: ${{ secrets.ACTIONS_DEMO_TOKEN }}
 
     - name: Simulate Deployment
       run: |
