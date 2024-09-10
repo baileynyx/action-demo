@@ -36,6 +36,26 @@ jobs:
         server-password: ${{ secrets.ACTIONS_DEMO_TOKEN }}
         overwrite-settings: true
 
+    - name: Debug - Print Environment Variables and Repository Info
+      run: |
+        echo "GitHub Actor: ${{ github.actor }}"
+        echo "Repository: ${{ github.repository }}"
+        echo "Ref: ${{ github.ref }}"
+        echo "Token Length: ${#secrets.ACTIONS_DEMO_TOKEN}"
+        if [ -z "${{ secrets.ACTIONS_DEMO_TOKEN }}" ]; then
+          echo "Error: ACTIONS_DEMO_TOKEN is not set or empty."
+          exit 1
+        else
+          echo "ACTIONS_DEMO_TOKEN is set."
+        fi
+
+        # Construct the repository and packages URLs
+        REPO_URL="https://github.com/${{ github.repository }}"
+        PACKAGE_URL="https://maven.pkg.github.com/${{ github.repository }}"
+        
+        echo "Constructed Repository URL: $REPO_URL"
+        echo "Constructed Packages URL: $PACKAGE_URL"
+
     - name: Create Maven settings.xml
       run: |
         mkdir -p $HOME/.m2
@@ -59,6 +79,21 @@ jobs:
         git config --global credential.helper store
         echo "https://x-access-token:${{ secrets.ACTIONS_DEMO_TOKEN }}@github.com" > ~/.git-credentials
 
+    - name: Update POM with Constructed URLs
+      run: |
+        REPO_URL="https://github.com/${{ github.repository }}"
+        PACKAGE_URL="https://maven.pkg.github.com/${{ github.repository }}"
+        mvn versions:set-property -Dproperty=repository.url -DnewVersion="$REPO_URL"
+        mvn versions:set-property -Dproperty=distribution.url -DnewVersion="$PACKAGE_URL"
+
+    - name: Debug - Verify Maven Settings and POM URL
+      run: |
+        echo "Maven settings.xml content:"
+        cat $HOME/.m2/settings.xml
+        
+        echo "pom.xml content:"
+        cat pom.xml
+        
     - name: Build with Maven
       run: mvn clean package
 
