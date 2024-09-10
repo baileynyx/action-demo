@@ -1,13 +1,10 @@
-name: Deploy Java Application
+name: Mock Deploy Application
 
 on:
-  workflow_dispatch:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+  workflow_run:
+    workflows: ["Java CI with Maven"]
+    types:
+      - completed
 
 permissions:
   contents: write
@@ -49,7 +46,7 @@ jobs:
       env:
         ACTIONS_DEMO_TOKEN: ${{ secrets.ACTIONS_DEMO_TOKEN }}
 
-    - name: Debug - Verify Maven Settings and POM URL
+    - name: Debug - Verify Maven Settings and Authentication
       run: |
         echo "Maven settings.xml content:"
         cat $HOME/.m2/settings.xml
