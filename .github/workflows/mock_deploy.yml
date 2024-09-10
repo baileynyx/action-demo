@@ -1,0 +1,71 @@
+name: Deploy Java Application
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  packages: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        persist-credentials: false
+        fetch-depth: 0
+        clean: true
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: Configure Maven to Use GitHub Packages
+      run: |
+        mkdir -p $HOME/.m2
+        echo '<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                      xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
+                      https://maven.apache.org/xsd/settings-1.0.0.xsd">
+                <servers>
+                  <server>
+                    <id>github</id>
+                    <username>${{ github.actor }}</username>
+                    <password>${{ secrets.ACTIONS_DEMO_TOKEN }}</password>
+                  </server>
+                </servers>
+              </settings>' > $HOME/.m2/settings.xml
+      env:
+        ACTIONS_DEMO_TOKEN: ${{ secrets.ACTIONS_DEMO_TOKEN }}
+
+    - name: Download Artifact from GitHub Packages
+      run: |
+        mvn dependency:get -Dartifact=com.example:actions-demo:1.0-SNAPSHOT -DrepoUrl=https://maven.pkg.github.com/${{ github.repository }}
+
+    - name: Simulate Deployment
+      run: |
+        DEPLOY_DIR=$HOME/deployments
+        mkdir -p $DEPLOY_DIR
+        cp $HOME/.m2/repository/com/example/actions-demo/1.0-SNAPSHOT/actions-demo-1.0-SNAPSHOT.jar $DEPLOY_DIR/
+        echo "Deployed actions-demo-1.0-SNAPSHOT.jar to $DEPLOY_DIR"
+
+    - name: Verify Deployment
+      run: |
+        DEPLOY_DIR=$HOME/deployments
+        if [ -f "$DEPLOY_DIR/actions-demo-1.0-SNAPSHOT.jar" ]; then
+          echo "Deployment successful!"
+        else
+          echo "Deployment failed!"
+          exit 1
+        fi
