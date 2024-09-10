@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.example</groupId>
@@ -8,7 +8,7 @@
   <version>1.0-SNAPSHOT</version>
 
   <name>actions-demo</name>
-  <url>https://github.com/BaileyNyx/actions-demo</url> <!-- Replace with the actual GitHub repository URL -->
+  <url>https://github.com/BaileyNyx/actions-demo</url> <!-- Replace with your actual GitHub repository URL -->
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -28,7 +28,7 @@
   <distributionManagement>
     <repository>
       <id>github</id>
-      <url>https://maven.pkg.github.com/BaileyNyx/actions-demo</url> <!-- Replace with the actual GitHub username and repository -->
+      <url>https://maven.pkg.github.com/BaileyNyx/actions-demo</url> <!-- Ensure this is correct for your GitHub Packages URL -->
     </repository>
   </distributionManagement>
 
@@ -64,7 +64,7 @@
         </plugin>
         <plugin>
           <artifactId>maven-deploy-plugin</artifactId>
-          <version>3.0.0-M1</version>
+          <version>3.0.0</version>
         </plugin>
         <plugin>
           <artifactId>maven-site-plugin</artifactId>

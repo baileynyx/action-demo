@@ -11,15 +11,7 @@ on:
 
 permissions:
   contents: write
-  actions: write
-  checks: write
-  deployments: write
-  issues: write
   packages: write
-  pull-requests: write
-  repository-projects: write
-  security-events: write
-  statuses: write
 
 jobs:
   build:
@@ -32,7 +24,7 @@ jobs:
         persist-credentials: false
         fetch-depth: 0
         clean: true
-        token: ${{ secrets.ACTIONS_DEMO_TOKEN }}
+        token: ${{ secrets.ACTIONS_DEMO_TOKEN }} # Use the custom PAT
 
     - name: Set up JDK 17
       uses: actions/setup-java@v3
