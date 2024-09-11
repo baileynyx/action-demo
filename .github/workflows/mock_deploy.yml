@@ -7,7 +7,7 @@ on:
       - completed
 
 permissions:
-  contents: write
+  contents: read  # Corrected to 'read' for accessing repository contents
   packages: read  # Only need read permission for packages
 
 jobs:
@@ -46,6 +46,12 @@ jobs:
       env:
         ACTIONS_DEMO_TOKEN: ${{ secrets.ACTIONS_DEMO_TOKEN }}
 
+    - name: Debug - Print Environment Variables
+      run: |
+        echo "GitHub Actor: ${{ github.actor }}"
+        echo "Token Length: ${#ACTIONS_DEMO_TOKEN}"
+      env:
+        ACTIONS_DEMO_TOKEN: ${{ secrets.ACTIONS_DEMO_TOKEN }}
 
     - name: Debug - Verify Maven Settings and Authentication
       run: |
@@ -56,7 +62,7 @@ jobs:
       run: |
         mvn dependency:get -Dartifact=com.example:actions-demo:1.0-SNAPSHOT \
                            -DrepoUrl=https://maven.pkg.github.com/${{ github.repository }} \
-                           -s $HOME/.m2/settings.xml
+                           -s $HOME/.m2/settings.xml -X
       env:
         ACTIONS_DEMO_TOKEN: ${{ secrets.ACTIONS_DEMO_TOKEN }}
 
