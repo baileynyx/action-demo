@@ -1,0 +1,109 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    
+    <groupId>com.example</groupId>
+    <artifactId>my-utils</artifactId>
+    <version>1.0</version>
+    <packaging>jar</packaging>
+
+    <name>My Utilities</name>
+    <description>A simple utility library for demonstration purposes</description>
+
+    <!-- Default Properties -->
+    <properties>
+        <github.username>default-username</github.username> <!-- Default values to prevent recursive error -->
+        <github.repository>default-repository</github.repository>
+        <maven.compiler.source>17</maven.compiler.source> <!-- Java source version -->
+        <maven.compiler.target>17</maven.compiler.target> <!-- Java target version -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding> <!-- Encoding for builds -->
+        <maven.deploy.skip>false</maven.deploy.skip> <!-- Ensure deployment is not skipped -->
+    </properties>
+
+    <licenses>
+        <license>
+            <name>The Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <url>https://github.com/${github.repository}</url>
+        <connection>scm:git:https://github.com/${github.repository}.git</connection>
+        <developerConnection>scm:git:git@github.com:${github.username}/${github.repository}.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
+
+    <developers>
+        <developer>
+            <id>${github.username}</id>
+            <name>${github.username}</name>
+            <email>${github.username}@users.noreply.github.com</email>
+        </developer>
+    </developers>
+
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <url>https://maven.pkg.github.com/${github.repository}</url> <!-- Use the property here -->
+        </repository>
+    </distributionManagement>
+
+    <build>
+        <plugins>
+            <!-- Compiler Plugin for setting Java version -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                </configuration>
+            </plugin>
+
+            <!-- Plugin for running tests -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.22.2</version>
+                <configuration>
+                    <testFailureIgnore>false</testFailureIgnore> <!-- Fail build if tests fail -->
+                </configuration>
+            </plugin>
+
+            <!-- Plugin for code quality checks (Checkstyle) -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>3.2.0</version> <!-- Updated to a newer version -->
+                <configuration>
+                    <configLocation>checkstyle.xml</configLocation> <!-- Path to the Checkstyle configuration -->
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                    <consoleOutput>true</consoleOutput>
+                    <failsOnError>true</failsOnError>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>verify</phase> <!-- Run checkstyle during the verify phase -->
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Plugin for deploying artifacts to GitHub Packages -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>3.1.2</version>
+                <configuration>
+                    <skip>${maven.deploy.skip}</skip> <!-- Control deployment via property -->
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

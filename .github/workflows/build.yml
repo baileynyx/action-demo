@@ -24,7 +24,7 @@ jobs:
         persist-credentials: false
         fetch-depth: 0
         clean: true
-        token: ${{ secrets.ACTIONS_DEMO_TOKEN }} # Use the custom PAT
+        token: ${{ secrets.ACTIONS_DEMO_TOKEN }}
 
     - name: Set up JDK 17
       uses: actions/setup-java@v3
@@ -36,70 +36,56 @@ jobs:
         server-password: ${{ secrets.ACTIONS_DEMO_TOKEN }}
         overwrite-settings: true
 
-    - name: Debug - Print Environment Variables and Repository Info
+    - name: Configure Maven to Use GitHub Packages
       run: |
-        echo "GitHub Actor: ${{ github.actor }}"
-        echo "Repository: ${{ github.repository }}"
-        echo "Ref: ${{ github.ref }}"
-        echo "Token Length: ${#ACTIONS_DEMO_TOKEN}"
-        if [ -z "$ACTIONS_DEMO_TOKEN" ]; then
-          echo "Error: ACTIONS_DEMO_TOKEN is not set or empty."
-          exit 1
-        else
-          echo "ACTIONS_DEMO_TOKEN is set."
-        fi
-
-        # Construct the repository and packages URLs
-        REPO_URL="https://github.com/${{ github.repository }}"
-        PACKAGE_URL="https://maven.pkg.github.com/${{ github.repository }}"
-        
-        echo "Constructed Repository URL: $REPO_URL"
-        echo "Constructed Packages URL: $PACKAGE_URL"
-      env:
-        ACTIONS_DEMO_TOKEN: ${{ secrets.ACTIONS_DEMO_TOKEN }}  # Set the environment variable
-
-    - name: Create Maven settings.xml
-      run: |
-        mkdir -p $HOME/.m2
+        mkdir -p $HOME/.m2 
         echo '<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
-                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                      xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
-                      https://maven.apache.org/xsd/settings-1.0.0.xsd">
-                <servers>
-                  <server>
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
+                  https://maven.apache.org/xsd/settings-1.0.0.xsd">
+            <servers>
+              <server>
+                <id>github</id>
+                <username>${{ github.actor }}</username>
+                <password>${{ secrets.ACTIONS_DEMO_TOKEN }}</password>
+              </server>
+            </servers>
+            <profiles>
+              <profile>
+                <id>github</id>
+                <repositories>
+                  <repository>
+                    <id>central</id>
+                    <url>https://repo.maven.apache.org/maven2</url>
+                  </repository>
+                  <repository>
                     <id>github</id>
-                    <username>${{ github.actor }}</username>
-                    <password>${{ secrets.ACTIONS_DEMO_TOKEN }}</password>
-                  </server>
-                </servers>
-              </settings>' > $HOME/.m2/settings.xml
-
-    - name: Set up Git Credentials
-      run: |
-        git config --global user.name "${{ github.actor }}"
-        git config --global user.email "${{ github.actor }}@users.noreply.github.com"
-        git config --global credential.helper store
-        echo "https://x-access-token:${{ secrets.ACTIONS_DEMO_TOKEN }}@github.com" > ~/.git-credentials
-
-    - name: Update POM with Constructed URLs
-      run: |
-        REPO_URL="https://github.com/${{ github.repository }}"
-        PACKAGE_URL="https://maven.pkg.github.com/${{ github.repository }}"
-        mvn versions:set-property -Dproperty=repository.url -DnewVersion="$REPO_URL"
-        mvn versions:set-property -Dproperty=distribution.url -DnewVersion="$PACKAGE_URL"
+                    <url>https://maven.pkg.github.com/${{ github.repository }}</url>
+                    <snapshots>
+                      <enabled>true</enabled>
+                    </snapshots>
+                  </repository>
+                </repositories>
+              </profile>
+            </profiles>
+            <activeProfiles>
+              <activeProfile>github</activeProfile>
+            </activeProfiles>
+          </settings>' > $HOME/.m2/settings.xml
       env:
-        ACTIONS_DEMO_TOKEN: ${{ secrets.ACTIONS_DEMO_TOKEN }}  # Set the environment variable
+        ACTIONS_DEMO_TOKEN: ${{ secrets.ACTIONS_DEMO_TOKEN }}
 
-    - name: Debug - Verify Maven Settings and POM URL
+    - name: Pull Generic Utility Package from GitHub Packages
       run: |
-        echo "Maven settings.xml content:"
-        cat $HOME/.m2/settings.xml
-        
-        echo "pom.xml content:"
-        cat pom.xml
-        
+        mvn dependency:get -Dartifact=com.example:my-utils:1.0 \
+                           -DrepoUrl=https://maven.pkg.github.com/${{ github.repository }} \
+                           -s $HOME/.m2/settings.xml -X
+      env:
+        ACTIONS_DEMO_TOKEN: ${{ secrets.ACTIONS_DEMO_TOKEN }}
+
     - name: Build with Maven
-      run: mvn clean package
+      run: |
+        mvn clean package -Dgithub.username=${{ github.actor }} -Dgithub.repository=${{ github.repository }}
 
     - name: Check for Artifact
       run: |
@@ -109,7 +95,8 @@ jobs:
         fi
 
     - name: Deploy to GitHub Packages
-      run: mvn deploy -X
+      run: |
+        mvn deploy -X -Dgithub.username=${{ github.actor }} -Dgithub.repository=${{ github.repository }}
 
     - name: Clear Git Credentials
       if: always()
