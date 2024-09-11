@@ -7,8 +7,8 @@ on:
       - completed
 
 permissions:
-  contents: read  # Corrected to 'read' for accessing repository contents
-  packages: read  # Only need read permission for packages
+  contents: read  # Required to access repository contents
+  packages: read  # Required to access GitHub Packages
 
 jobs:
   deploy:
