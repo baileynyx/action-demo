@@ -7,8 +7,8 @@ on:
       - completed
 
 permissions:
-  contents: write
-  packages: read  # Only need read permission for packages
+  contents: read
+  packages: read
 
 jobs:
   deploy:
@@ -42,23 +42,50 @@ jobs:
                     <password>${{ secrets.ACTIONS_DEMO_TOKEN }}</password>
                   </server>
                 </servers>
+                <profiles>
+                  <profile>
+                    <id>github</id>
+                    <repositories>
+                      <repository>
+                        <id>central</id>
+                        <url>https://repo.maven.apache.org/maven2</url>
+                      </repository>
+                      <repository>
+                        <id>github</id>
+                        <url>https://maven.pkg.github.com/${{ github.repository }}</url>
+                        <snapshots>
+                          <enabled>true</enabled>
+                        </snapshots>
+                      </repository>
+                    </repositories>
+                  </profile>
+                </profiles>
+                <activeProfiles>
+                  <activeProfile>github</activeProfile>
+                </activeProfiles>
               </settings>' > $HOME/.m2/settings.xml
       env:
         ACTIONS_DEMO_TOKEN: ${{ secrets.ACTIONS_DEMO_TOKEN }}
-
-
-    - name: Debug - Verify Maven Settings and Authentication
-      run: |
-        echo "Maven settings.xml content:"
-        cat $HOME/.m2/settings.xml
 
     - name: Download Artifact from GitHub Packages
       run: |
         mvn dependency:get -Dartifact=com.example:actions-demo:1.0-SNAPSHOT \
                            -DrepoUrl=https://maven.pkg.github.com/${{ github.repository }} \
-                           -s $HOME/.m2/settings.xml
+                           -s $HOME/.m2/settings.xml -X
       env:
         ACTIONS_DEMO_TOKEN: ${{ secrets.ACTIONS_DEMO_TOKEN }}
+
+    - name: Verify File Location and Content
+      run: |
+        echo "Checking for the existence of the file..."
+        FILE_PATH="$HOME/.m2/repository/com/example/actions-demo/1.0-SNAPSHOT/actions-demo-1.0-SNAPSHOT.jar"
+        if [ -f "$FILE_PATH" ]; then
+          echo "File exists at $FILE_PATH"
+          ls -lh "$FILE_PATH"
+        else
+          echo "File not found at $FILE_PATH"
+          exit 1
+        fi
 
     - name: Simulate Deployment
       run: |
