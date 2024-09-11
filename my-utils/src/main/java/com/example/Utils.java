@@ -2,11 +2,11 @@
 package com.example;
 
 public class Utils {
-    public static String greet(String name) {
+    public static String greet(final String name) {
         return "Hello, " + name + "!";
     }
 
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         System.out.println(greet("World"));
     }
 }
