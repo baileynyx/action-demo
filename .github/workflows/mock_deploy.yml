@@ -42,6 +42,27 @@ jobs:
                     <password>${{ secrets.ACTIONS_DEMO_TOKEN }}</password>
                   </server>
                 </servers>
+                <profiles>
+                  <profile>
+                    <id>github</id>
+                    <repositories>
+                      <repository>
+                        <id>central</id>
+                        <url>https://repo.maven.apache.org/maven2</url>
+                      </repository>
+                      <repository>
+                        <id>github</id>
+                        <url>https://maven.pkg.github.com/${{ github.repository }}</url>
+                        <snapshots>
+                          <enabled>true</enabled>
+                        </snapshots>
+                      </repository>
+                    </repositories>
+                  </profile>
+                </profiles>
+                <activeProfiles>
+                  <activeProfile>github</activeProfile>
+                </activeProfiles>
               </settings>' > $HOME/.m2/settings.xml
       env:
         ACTIONS_DEMO_TOKEN: ${{ secrets.ACTIONS_DEMO_TOKEN }}
