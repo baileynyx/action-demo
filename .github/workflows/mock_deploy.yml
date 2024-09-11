@@ -7,8 +7,8 @@ on:
       - completed
 
 permissions:
-  contents: read  # Required to access repository contents
-  packages: read  # Required to access GitHub Packages
+  contents: read
+  packages: read
 
 jobs:
   deploy:
@@ -67,18 +67,6 @@ jobs:
       env:
         ACTIONS_DEMO_TOKEN: ${{ secrets.ACTIONS_DEMO_TOKEN }}
 
-    - name: Debug - Print Environment Variables
-      run: |
-        echo "GitHub Actor: ${{ github.actor }}"
-        echo "Token Length: ${#ACTIONS_DEMO_TOKEN}"
-      env:
-        ACTIONS_DEMO_TOKEN: ${{ secrets.ACTIONS_DEMO_TOKEN }}
-
-    - name: Debug - Verify Maven Settings and Authentication
-      run: |
-        echo "Maven settings.xml content:"
-        cat $HOME/.m2/settings.xml
-
     - name: Download Artifact from GitHub Packages
       run: |
         mvn dependency:get -Dartifact=com.example:actions-demo:1.0-SNAPSHOT \
@@ -86,6 +74,18 @@ jobs:
                            -s $HOME/.m2/settings.xml -X
       env:
         ACTIONS_DEMO_TOKEN: ${{ secrets.ACTIONS_DEMO_TOKEN }}
+
+    - name: Verify File Location and Content
+      run: |
+        echo "Checking for the existence of the file..."
+        FILE_PATH="$HOME/.m2/repository/com/example/actions-demo/1.0-SNAPSHOT/actions-demo-1.0-SNAPSHOT.jar"
+        if [ -f "$FILE_PATH" ]; then
+          echo "File exists at $FILE_PATH"
+          ls -lh "$FILE_PATH"
+        else
+          echo "File not found at $FILE_PATH"
+          exit 1
+        fi
 
     - name: Simulate Deployment
       run: |
