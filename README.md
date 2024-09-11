@@ -1,6 +1,8 @@
 # Sample Maven Application
 This repository demonstrates a CI/CD pipeline using GitHub Actions to build, package, and deploy a sample Maven application. The workflows include steps for compiling the code, running tests, building the application, uploading the artifacts to GitHub Packages, and finally deploying the package to a simulated environment.
 
+To kick off a build
+
 # Workflows
 ## Java CI with Maven
 This workflow is responsible for building the Maven application, running tests, and uploading the package to GitHub Packages.
