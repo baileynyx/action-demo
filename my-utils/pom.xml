@@ -47,9 +47,10 @@
     <distributionManagement>
         <repository>
             <id>github</id>
-            <url>https://maven.pkg.github.com/${github.repository}</url> <!-- Use the property here -->
+            <url>https://maven.pkg.github.com/${github.username}/${github.repository}</url>
         </repository>
     </distributionManagement>
+
 
     <build>
         <plugins>
